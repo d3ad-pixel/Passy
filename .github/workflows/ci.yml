@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -37,8 +39,26 @@ jobs:
           node-version: 20
           cache: pnpm
 
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Cache Vite/esbuild cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/vite
+            node_modules/.vite
+          key: ${{ runner.os }}-vite-${{ hashFiles('**/pnpm-lock.yaml', '**/vite.config.*', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vite-
 
       - name: Type-check and build frontend
         run: pnpm run build
@@ -50,16 +70,18 @@ jobs:
 
       - name: Cache Rust
         uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            src-tauri -> target
 
       - name: Install Linux dependencies (Tauri)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
             libwebkit2gtk-4.1-dev \
             build-essential \
             curl \
-            wget \
             file \
             libxdo-dev \
             libssl-dev \
