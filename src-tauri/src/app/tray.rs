@@ -62,8 +62,10 @@ pub fn install_tray(app: &tauri::App) -> tauri::Result<()> {
         .build()
         {
             let win_clone = win.clone();
-            win.on_window_event(move |e| if let tauri::WindowEvent::Focused(false) = e {
-                let _ = win_clone.hide();
+            win.on_window_event(move |e| {
+                if let tauri::WindowEvent::Focused(false) = e {
+                    let _ = win_clone.hide();
+                }
             });
         }
     }
