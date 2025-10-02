@@ -89,9 +89,7 @@ pub fn calculate_password_strength_from_password(password: String) -> PasswordSt
     let has_lower = password.chars().any(|c| c.is_ascii_lowercase());
     let has_upper = password.chars().any(|c| c.is_ascii_uppercase());
     let has_numeric = password.chars().any(|c| c.is_ascii_digit());
-    let has_symbols = password
-        .chars()
-        .any(|c| !c.is_ascii_alphanumeric());
+    let has_symbols = password.chars().any(|c| !c.is_ascii_alphanumeric());
 
     let mut pool: f64 = 0.0;
     if has_lower {
