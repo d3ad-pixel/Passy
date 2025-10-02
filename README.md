@@ -1,48 +1,49 @@
-# Tauri + React + Typescript
+# Passy
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+Passy is a lightweight, cross‑platform desktop password generator built with Tauri (Rust) and React. It focuses on fast, offline password creation with a clear strength indicator and a convenient system tray experience.
 
-## CI/CD (GitHub Actions)
+## Key Features
 
-Two workflows are included in `.github/workflows/`:
+- Strong password generation with customizable options:
+  - **Length** control
+  - Include **letters**, **numbers**, and **symbols**
+  - Option to **avoid ambiguous characters** (e.g., 0/O, 1/l)
+- Real‑time strength meter based on estimated entropy
+- One‑click copy workflow (from the main window)
+- Tray integration for quick access; opens a compact tray window near the system tray
+- Cross‑platform builds for Windows, macOS, and Linux
 
-- `ci.yml`: Runs on pushes and PRs to `main`/`master`. It installs deps, builds the frontend (`pnpm build`), and runs Rust checks (`cargo check`, `clippy`, `fmt`).
-- `release.yml`: Runs on tag pushes like `v1.2.3` across macOS, Linux, and Windows using the official Tauri action. It builds installers and uploads them to a GitHub Release.
+## How It Works
 
-### How to trigger a release
+- Passwords are generated using a native Rust command exposed via Tauri. The UI triggers the command and receives the generated value.
+- The strength meter estimates entropy from selected character pools and length, classifying results as Weak, Fair, Good, or Strong.
+- On Linux, required WebKit/GTK dependencies are installed at build time; macOS and Windows binaries are produced via the CI release workflow.
 
-1. Ensure your version in `src-tauri/tauri.conf.json` is what you want to ship (optional but recommended).
-2. Create and push a tag:
+## Usage
 
-   ```bash
-   git tag v1.1.0
-   git push origin v1.1.0
-   ```
+1. Launch the app to open the main window.
+2. Adjust length and toggle character sets and the “avoid ambiguous” option.
+3. Generate and copy the password.
+4. Use the tray icon to quickly reveal the compact generator near your system tray.
 
-3. The Release workflow will build per-OS artifacts and attach them to the GitHub Release created for that tag.
+## Development
 
-### Optional code signing and notarization
+- Frontend: React + TypeScript
+- Backend: Rust (Tauri commands)
+- Package manager: pnpm
 
-If you want signed/notarized builds, add these repository secrets:
+### Scripts
 
-- TAURI_SIGNING_PRIVATE_KEY
-- TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+```bash
+pnpm install
+pnpm dev       # start the dev server and Tauri
+pnpm build     # build frontend assets
+```
 
-macOS (optional notarization):
+## Releases
 
-- APPLE_ID
-- APPLE_PASSWORD (app-specific password)
-- APPLE_TEAM_ID
+Releases are created by pushing a tag like `v1.2.3`. A GitHub Action builds platform installers and uploads them to the release page. Pre‑releases are detected if the tag contains `-rc`, `-beta`, or `-alpha`.
 
-Windows (optional signing):
+## License
 
-- WINDOWS_CERTIFICATE (base64 PFX)
-- WINDOWS_CERTIFICATE_PASSWORD
-
-GitHub → `Settings` → `Secrets and variables` → `Actions` → `New repository secret`.
-
-On Linux, no extra secrets are required. The workflow installs the necessary system packages for WebKit/GTK builds.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+MIT
