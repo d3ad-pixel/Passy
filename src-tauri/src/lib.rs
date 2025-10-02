@@ -34,7 +34,8 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            commands::password::generate_password
+            commands::password::generate_password,
+            commands::password::calculate_password_strength_from_password
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

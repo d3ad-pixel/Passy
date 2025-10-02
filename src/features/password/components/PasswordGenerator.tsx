@@ -1,9 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import SelectableOption from "@/components/ui/SelectableOption";
-import {
-  generatePassword,
-  calculatePasswordStrengthFromPassword,
-} from "@/features/password/services/password";
+import { generatePassword, calculatePasswordStrengthFromPassword, type PasswordStrength } from "@/features/password/services/password";
 import { setWindowSize } from "@/lib/window";
 import Slider from "@/components/ui/Slider";
 import toast from "react-hot-toast";
@@ -38,8 +35,18 @@ export default function PasswordGenerator() {
     }
   }
 
-  const strength = useMemo(() => {
-    return calculatePasswordStrengthFromPassword(password);
+  const [strength, setStrength] = useState<PasswordStrength>({ label: "Weak", color: "bg-red-500", pct: 0 });
+
+  useEffect(() => {
+    let aborted = false;
+    const run = async () => {
+      try {
+        const s = await calculatePasswordStrengthFromPassword(password);
+        if (!aborted) setStrength(s);
+      } catch {}
+    };
+    run();
+    return () => { aborted = true; };
   }, [password]);
 
   return (

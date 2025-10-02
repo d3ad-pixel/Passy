@@ -1,5 +1,6 @@
 use rand::distributions::{Alphanumeric, DistString, Distribution, Uniform};
 use rand::thread_rng;
+use serde::Serialize;
 
 #[derive(serde::Deserialize)]
 pub struct PasswordOptions {
@@ -65,4 +66,76 @@ pub fn generate_password(options: PasswordOptions) -> String {
             charset[idx]
         })
         .collect()
+}
+
+#[derive(Serialize)]
+pub struct PasswordStrength {
+    pub label: String,
+    pub color: String,
+    pub pct: f32,
+}
+
+#[tauri::command]
+pub fn calculate_password_strength_from_password(password: String) -> PasswordStrength {
+    let length = password.chars().count();
+    if length == 0 {
+        return PasswordStrength {
+            label: "Weak".to_string(),
+            color: "bg-red-500".to_string(),
+            pct: 0.0,
+        };
+    }
+
+    let has_lower = password.chars().any(|c| c.is_ascii_lowercase());
+    let has_upper = password.chars().any(|c| c.is_ascii_uppercase());
+    let has_numeric = password.chars().any(|c| c.is_ascii_digit());
+    let has_symbols = password
+        .chars()
+        .any(|c| !c.is_ascii_alphanumeric());
+
+    let mut pool: f64 = 0.0;
+    if has_lower {
+        pool += 26.0;
+    }
+    if has_upper {
+        pool += 26.0;
+    }
+    if has_numeric {
+        pool += 10.0;
+    }
+    if has_symbols {
+        pool += 32.0; // approximate symbol set size
+    }
+    if pool == 0.0 {
+        pool = 1.0;
+    }
+
+    let entropy = pool.log2() * (length as f64);
+
+    if entropy < 35.0 {
+        return PasswordStrength {
+            label: "Weak".to_string(),
+            color: "bg-red-500".to_string(),
+            pct: 0.33,
+        };
+    }
+    if entropy < 60.0 {
+        return PasswordStrength {
+            label: "Fair".to_string(),
+            color: "bg-orange-500".to_string(),
+            pct: 0.5,
+        };
+    }
+    if entropy < 80.0 {
+        return PasswordStrength {
+            label: "Good".to_string(),
+            color: "bg-yellow-500".to_string(),
+            pct: 0.75,
+        };
+    }
+    PasswordStrength {
+        label: "Strong".to_string(),
+        color: "bg-green-600".to_string(),
+        pct: 1.0,
+    }
 }

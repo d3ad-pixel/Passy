@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { calculatePasswordStrengthFromPassword, generatePassword } from "@/features/password/services/password";
+import { calculatePasswordStrengthFromPassword, generatePassword, type PasswordStrength } from "@/features/password/services/password";
 import SelectableOption from "@/components/ui/SelectableOption";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
@@ -49,8 +49,18 @@ export default function TrayPage() {
     }
   }
 
-  const strength = useMemo(() => {
-    return calculatePasswordStrengthFromPassword(password);
+  const [strength, setStrength] = useState<PasswordStrength>({ label: "Weak", color: "bg-red-500", pct: 0 });
+
+  useEffect(() => {
+    let aborted = false;
+    const run = async () => {
+      try {
+        const s = await calculatePasswordStrengthFromPassword(password);
+        if (!aborted) setStrength(s);
+      } catch {}
+    };
+    run();
+    return () => { aborted = true; };
   }, [password]);
 
   const strengthTextColor = useMemo(() => {
