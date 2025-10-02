@@ -1,0 +1,23 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": ["main", "tray"],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "core:window:allow-inner-size",
+    "core:window:allow-inner-position",
+    "core:window:allow-current-monitor",
+    "core:window:allow-scale-factor",
+    "core:window:allow-set-position",
+    "core:window:allow-set-max-size",
+    "core:window:allow-set-min-size",
+    "core:window:allow-is-resizable",
+    "core:window:allow-set-size",
+    "core:window:allow-set-resizable",
+    "core:window:allow-hide",
+    "positioner:default",
+    "positioner:allow-move-window-constrained"
+  ]
+}
