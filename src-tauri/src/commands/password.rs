@@ -48,7 +48,7 @@ fn build_charset(options: &PasswordOptions) -> Vec<char> {
 #[tauri::command]
 pub fn generate_password(options: PasswordOptions) -> String {
     let mut rng = thread_rng();
-    let length = options.length.max(1).min(1024);
+    let length = options.length.clamp(1, 1024);
 
     // Fast path using the built-in Alphanumeric distribution when applicable
     if options.use_alpha && options.use_numeric && !options.use_symbols {

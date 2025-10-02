@@ -16,7 +16,7 @@ pub fn install_tray(app: &tauri::App) -> tauri::Result<()> {
         .menu(&tray_menu)
         .on_tray_icon_event(|tray, event| {
             // Forward tray events to the positioner plugin so it knows the tray location
-            on_tray_event(&tray.app_handle(), &event);
+            on_tray_event(tray.app_handle(), &event);
 
             if let tauri::tray::TrayIconEvent::Click { button, .. } = event {
                 if button == tauri::tray::MouseButton::Left {
@@ -58,15 +58,12 @@ pub fn install_tray(app: &tauri::App) -> tauri::Result<()> {
         .always_on_top(true)
         .resizable(true)
         .visible(false)
-        // .initialization_script(crate::app::scripts::CONTEXT_MENU_BLOCK_JS)
+        .initialization_script(crate::app::scripts::CONTEXT_MENU_BLOCK_JS)
         .build()
         {
             let win_clone = win.clone();
-            win.on_window_event(move |e| match e {
-                tauri::WindowEvent::Focused(false) => {
-                    let _ = win_clone.hide();
-                }
-                _ => {}
+            win.on_window_event(move |e| if let tauri::WindowEvent::Focused(false) = e {
+                let _ = win_clone.hide();
             });
         }
     }

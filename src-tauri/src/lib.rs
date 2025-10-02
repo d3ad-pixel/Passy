@@ -24,10 +24,10 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .on_page_load(|window, _| {
-            // let _ = window.eval(crate::app::scripts::PAGE_INIT_JS);
+            let _ = window.eval(crate::app::scripts::PAGE_INIT_JS);
         })
         .on_window_event(|window, event| {
-            crate::app::events::handle_window_event(window, &event);
+            crate::app::events::handle_window_event(window, event);
         })
         .setup(|app| {
             crate::app::tray::install_tray(app)?;
